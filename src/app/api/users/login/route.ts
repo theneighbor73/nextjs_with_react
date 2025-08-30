@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
     if (!validPassword) {
       return NextResponse.json({ error: "Invalid password" }, { status: 400 });
     }
-    console.log(user);
+    // console.log(user);
 
     //create token data
     const tokenData = {
@@ -43,11 +43,23 @@ export async function POST(request: NextRequest) {
     const response = NextResponse.json({
       message: "Login successful",
       success: true,
+      data: user,
       // userId: user._id.toString(),
     });
+    // response.cookies.set("token", token, {
+    //   httpOnly: true,
+    // });
+
     response.cookies.set("token", token, {
-      httpOnly: true,
+      httpOnly: true, // protect against XSS
+      secure: process.env.NODE_ENV === "production", // send only over HTTPS in prod
+      sameSite: "lax", // CSRF protection
+      path: "/", // make it available across the app
+      maxAge: 60 * 60 * 24, // 1 day
     });
+
+    console.log(response);
+
     return response;
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });

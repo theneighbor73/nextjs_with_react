@@ -4,6 +4,7 @@ import Link from "next/link";
 import React, { useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/useAuth";
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -11,10 +12,12 @@ export default function ProfilePage() {
   const [verifyEmail, setVerifyEmail] = useState(false);
   const [useremail, setEmail] = useState("na");
   const [emailSent, setEmailSent] = useState(false);
+  const { setAuth } = useAuth();
 
   const logout = async () => {
     try {
       await axios.get("/api/users/logout");
+      setAuth(null);
       toast.success("Logout successful");
       router.push("/login");
     } catch (error: any) {

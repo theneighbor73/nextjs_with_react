@@ -19,5 +19,13 @@ export function middleware(request: NextRequest) {
 
 // See "Matching Paths" below to learn more
 export const config = {
-  matcher: ["/", "/profile/:path*", "/login", "/signup", "/verifyemail"],
+  matcher: ["/profile/:path*", "/login", "/signup", "/verifyemail"],
 };
+
+/*
+Next.js automatically picks up middleware.ts in the root.
+
+For every request matching your matcher config, this function runs before rendering.
+
+You don’t need to import it anywhere.
+*/
