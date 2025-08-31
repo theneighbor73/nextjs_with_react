@@ -28,13 +28,29 @@ export default function ProfilePage() {
   return (
     <>
       <div className="w-full bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
-        <a href="/">
+        {/* Avatar wrapper for centering */}
+        <div className="flex justify-center mt-6">
+          <a href="/">
+            <img
+              className="h-40 w-40 rounded-full border-2 border-indigo-300 object-cover p-1 ring-indigo-500"
+              src={
+                user?.avatar ||
+                "https://res.cloudinary.com/dhjy4oh18/image/upload/v1756629086/Adobe_Express_-_file_trqu1g.png"
+              }
+              alt="default avatar"
+            />
+          </a>
+        </div>
+        {/* <a href="/">
           <img
-            className="p-8 rounded-t-lg mx-auto block"
-            src="https://res.cloudinary.com/dhjy4oh18/image/upload/v1756629086/Adobe_Express_-_file_trqu1g.png"
+            className="h-40 w-40 rounded-full border-2 border-indigo-300 object-cover p-1 ring-indigo-500"
+            src={
+              user?.avatar ||
+              "https://res.cloudinary.com/dhjy4oh18/image/upload/v1756629086/Adobe_Express_-_file_trqu1g.png"
+            }
             alt="default avatar"
           />
-        </a>
+        </a> */}
         <div className="px-5 pb-5 text-center">
           <a href="/">
             <h5 className="text-xl font-semibold tracking-tight text-gray-900 dark:text-white">
@@ -43,7 +59,7 @@ export default function ProfilePage() {
           </a>
           <a>
             <h5 className="mt-1 text-lg italic font-serif text-gray-700 dark:text-gray-300">
-              {user?.bio}
+              {user?.bio || "Bio goes here..."}
             </h5>
           </a>
 

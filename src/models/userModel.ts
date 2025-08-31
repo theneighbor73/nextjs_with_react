@@ -6,6 +6,7 @@ export interface UserDocument extends Document {
   email: string;
   password: string;
   isVerified: boolean;
+  avatar: string;
   elo: number;
   bio: string;
   isAdmin: boolean;
@@ -33,6 +34,12 @@ const userSchema = new mongoose.Schema<UserDocument>({
   isVerified: {
     type: Boolean,
     default: false,
+  },
+  avatar: {
+    type: String,
+    default:
+      "https://res.cloudinary.com/dhjy4oh18/image/upload/v1756629086/Adobe_Express_-_file_trqu1g.png",
+    required: true,
   },
   elo: {
     type: Number,

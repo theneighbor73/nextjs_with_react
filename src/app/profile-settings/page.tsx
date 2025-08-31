@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import { useAuth } from "@/context/useAuth";
 import axios from "axios";
 import toast from "react-hot-toast";
 
@@ -9,7 +10,11 @@ function ProfileSettings({
   setDetails,
   onSave,
   buttonDisabled,
+  handleFileChange,
   loading,
+  uploading,
+  user,
+  error,
 }: any) {
   return (
     <div className="p-2 md:p-4">
@@ -19,19 +24,34 @@ function ProfileSettings({
         {/* Profile Image + Buttons */}
         <div className="mx-auto mt-8 grid max-w-2xl">
           <div className="flex flex-col items-start space-y-5 sm:flex-row sm:space-x-6 sm:space-y-0">
-            <img
-              className="h-40 w-40 rounded-full border-2 border-indigo-300 object-cover p-1 ring-indigo-500"
-              src="https://res.cloudinary.com/dhjy4oh18/image/upload/v1756629086/Adobe_Express_-_file_trqu1g.png"
-              alt="Profile avatar"
-            />
+            <div className="relative">
+              <img
+                className="h-40 w-40 rounded-full border-2 border-indigo-300 object-cover p-1 ring-indigo-500"
+                src={
+                  user?.avatar ||
+                  "https://res.cloudinary.com/dhjy4oh18/image/upload/v1756629086/Adobe_Express_-_file_trqu1g.png"
+                }
+                alt="Profile avatar"
+              />
+              {uploading && (
+                <div className="absolute inset-0 bg-black bg-opacity-50 rounded-full flex items-center justify-center">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+                </div>
+              )}
+            </div>
 
             <div className="flex flex-col space-y-4 sm:ml-6">
-              <button
-                type="button"
-                className="rounded-lg border border-indigo-200 bg-indigo-900 px-7 py-3.5 text-base font-medium text-indigo-50 hover:bg-indigo-800 focus:outline-none focus:ring-4 focus:ring-indigo-200"
-              >
-                Change picture
-              </button>
+              <label className="rounded-lg border border-indigo-200 bg-indigo-900 px-7 py-3.5 text-base font-medium text-indigo-50 hover:bg-indigo-800 focus:outline-none focus:ring-4 focus:ring-indigo-200 cursor-pointer">
+                {uploading ? "Uploading..." : "Change picture"}
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleFileChange}
+                  disabled={uploading}
+                />
+              </label>
+              {error && <p className="text-red-500 text-sm">{error}</p>}
             </div>
           </div>
 
@@ -206,6 +226,7 @@ function PasswordSettings({
 
 export default function SettingsPage() {
   const [active, setActive] = useState<"profile" | "password">("profile");
+  const { user, setAuth } = useAuth();
   const [details, setDetails] = useState({
     username: "",
     email: "",
@@ -219,6 +240,8 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState(false);
   const [buttonDisabled, setButtonDisabled] = useState(true);
   const [passwordButtonDisabled, setPasswordButtonDisabled] = useState(true);
+  const [error, setError] = useState("");
+  const [uploading, setUploading] = useState(false);
 
   const onSave = async () => {
     try {
@@ -228,7 +251,10 @@ export default function SettingsPage() {
         newEmail: details.email,
         newBio: details.bio,
       });
-      console.log("Update success", response.data);
+      console.log("Update success", response.data.data);
+      if (response.data?.data) {
+        setAuth(response.data.data);
+      }
       toast.success("Save success");
       setDetails({ username: "", email: "", bio: "" });
     } catch (error: any) {
@@ -260,6 +286,49 @@ export default function SettingsPage() {
       toast.error(error.response?.data?.error || error.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // validate
+    // if (!file.type.startsWith("image/")) {
+    //   setError("Please select an image file");
+    //   return;
+    // }
+    if (file.size > 5 * 1024 * 1024) {
+      setError("File size must be less than 5MB");
+      return;
+    }
+
+    setUploading(true);
+    setError("");
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await fetch("/api/users/change-avatar", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await response.json();
+      console.log(data);
+
+      if (!response.ok) {
+        throw new Error(data.error || "Upload failed");
+      }
+
+      if (data.data) {
+        setAuth(data.data);
+      }
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -314,6 +383,10 @@ export default function SettingsPage() {
             onSave={onSave}
             buttonDisabled={buttonDisabled}
             loading={loading}
+            handleFileChange={handleFileChange} // missing
+            uploading={uploading} // missing
+            error={error} // missing
+            user={user}
           />
         )}
         {active === "password" && (
