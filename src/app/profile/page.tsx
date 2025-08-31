@@ -1,38 +1,14 @@
 "use client";
 import axios from "axios";
-import Link from "next/link";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/useAuth";
 
 export default function ProfilePage() {
   const router = useRouter();
-  const [data, setData] = useState("nothing");
-  const [verifyEmail, setVerifyEmail] = useState(false);
-  const [useremail, setEmail] = useState("na");
   const [emailSent, setEmailSent] = useState(false);
-  const { setAuth } = useAuth();
-
-  const logout = async () => {
-    try {
-      await axios.get("/api/users/logout");
-      setAuth(null);
-      toast.success("Logout successful");
-      router.push("/login");
-    } catch (error: any) {
-      console.log(error.message);
-      toast.error(error.message);
-    }
-  };
-
-  const getUserDetails = async () => {
-    const res = await axios.get("/api/users/me");
-    console.log(res.data);
-    setData(res.data.data._id);
-    setVerifyEmail(res.data.data.isVerfied);
-    setEmail(res.data.data.email);
-  };
+  const { user } = useAuth();
 
   const resendVerificationEmail = async (email: string, userId: string) => {
     try {
@@ -49,51 +25,55 @@ export default function ProfilePage() {
     }
   };
 
-  // Run on page load
-  useEffect(() => {
-    getUserDetails();
-  }, []);
-
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen py-2">
-      <h1>Profile</h1>
-      <hr />
-      <p>Profile page</p>
-      <h2 className="p-1 rounded bg-green-500">
-        {data === "nothing" ? (
-          "Nothing"
-        ) : (
-          <Link href={`/profile/${data}`}>{data}</Link>
-        )}
-      </h2>
-      <hr />
-      <button
-        onClick={logout}
-        className="bg-blue-500 mt-4 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-      >
-        Logout
-      </button>
-      {!verifyEmail && (
-        <div>
-          <p className="text-white">
-            Account verification email has been sent. Please check your inbox to
-            verify your account. If you face any issues, please retry by
-            clicking the button below.
-          </p>
-          <button
-            onClick={() => resendVerificationEmail(useremail, data)}
-            disabled={emailSent} // ✅ prevent re-click
-            className={`mt-4 font-bold py-2 px-4 rounded text-white 
-    ${
-      emailSent
-        ? "bg-gray-400 cursor-not-allowed"
-        : "bg-green-800 hover:bg-blue-700"
-    }`}
-          >
-            {emailSent ? "Verification Sent" : "Resend verify email"}
-          </button>
+    <>
+      <div className="w-full bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+        <a href="/">
+          <img
+            className="p-8 rounded-t-lg mx-auto block"
+            src="https://res.cloudinary.com/dhjy4oh18/image/upload/v1756629086/Adobe_Express_-_file_trqu1g.png"
+            alt="default avatar"
+          />
+        </a>
+        <div className="px-5 pb-5 text-center">
+          <a href="/">
+            <h5 className="text-xl font-semibold tracking-tight text-gray-900 dark:text-white">
+              {user?.username}
+            </h5>
+          </a>
+          <a>
+            <h5 className="mt-1 text-lg italic font-serif text-gray-700 dark:text-gray-300">
+              {user?.bio}
+            </h5>
+          </a>
+
+          <div className="flex items-center justify-between mt-4">
+            <span className="bg-yellow-100 text-yellow-800 text-lg font-bold px-3 py-1 rounded-lg border border-yellow-300 shadow-sm">
+              Elo: 1000
+            </span>
+            {!user?.isVerified && (
+              <button
+                onClick={() => resendVerificationEmail(user?.email, user?._id)}
+                disabled={emailSent}
+                className={`text-white focus:ring-4 focus:outline-none font-medium rounded-lg text-sm px-5 py-2.5 text-center
+      ${
+        emailSent
+          ? "bg-gray-400 cursor-not-allowed"
+          : "bg-green-800 hover:bg-green-900 focus:ring-green-300 dark:bg-green-700 dark:hover:bg-green-800 dark:focus:ring-green-900"
+      }`}
+              >
+                {emailSent ? "Verification Sent" : "Verify account"}
+              </button>
+            )}
+            <a
+              href="/profile-settings"
+              className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+            >
+              Profile settings
+            </a>
+          </div>
         </div>
-      )}
-    </div>
+      </div>
+    </>
   );
 }

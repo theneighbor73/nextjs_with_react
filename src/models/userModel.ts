@@ -5,7 +5,9 @@ export interface UserDocument extends Document {
   username: string;
   email: string;
   password: string;
-  isVerfied: boolean;
+  isVerified: boolean;
+  elo: number;
+  bio: string;
   isAdmin: boolean;
   forgotPasswordToken?: string;
   forgotPasswordTokenExpiry?: Date;
@@ -28,9 +30,17 @@ const userSchema = new mongoose.Schema<UserDocument>({
     type: String,
     required: [true, "Please provide a password"],
   },
-  isVerfied: {
+  isVerified: {
     type: Boolean,
     default: false,
+  },
+  elo: {
+    type: Number,
+    default: 1000,
+  },
+  bio: {
+    type: String,
+    default: "Write your bio...",
   },
   isAdmin: {
     type: Boolean,

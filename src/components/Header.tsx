@@ -21,7 +21,7 @@ export default function Header() {
   };
 
   return (
-    <nav className="bg-white border-gray-200 px-4 lg:px-6 py-2.5">
+    <nav className="fixed top-0 left-0 w-full z-50 bg-white border-gray-200 px-4 lg:px-6 py-2.5">
       <div className="flex flex-wrap justify-between items-center mx-auto max-w-screen-xl">
         <Link href="/" className="flex items-center">
           <img
@@ -38,7 +38,7 @@ export default function Header() {
             <>
               {/* 👤 Hello, username (not clickable) */}
               <span className="text-gray-800 font-medium rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 mr-2">
-                Hello, {user}
+                Hello, {user.username}
               </span>
               {/* 🚪 Logout button */}
               <button

@@ -1,10 +1,11 @@
 "use client";
 import { createContext } from "react";
+import { UserDocument } from "@/models/userModel";
 
 type AuthContextType = {
-  user: string | null; // username only
+  user: UserDocument | null;
   loading: boolean;
-  setAuth: (user: string | null) => void;
+  setAuth: (user: UserDocument | null) => void;
   logout: () => void;
 };
 

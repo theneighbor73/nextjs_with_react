@@ -33,7 +33,7 @@ export default function RootLayout({
         {/*  */}
         <AuthProvider>
           <Header />
-          <main>{children}</main>
+          <main className="pt-17">{children}</main>
           <Footer />
         </AuthProvider>
         {/*  */}

@@ -2,18 +2,17 @@
 import { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import { AuthContext } from "./AuthContext";
+import { UserDocument } from "@/models/userModel";
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setAuth] = useState<string | null>(null);
+  const [user, setAuth] = useState<UserDocument | null>(null);
   const [loading, setLoading] = useState(true);
 
   const fetchUser = useCallback(async () => {
     try {
       const res = await axios.get("/api/users/me");
       console.log("Fetched user:", res.data.data);
-
-      // explicitly tell TypeScript this matches UserDocument
-      setAuth(res.data.data.username ?? null);
+      setAuth(res.data.data);
     } catch (error) {
       console.error("Failed to fetch user:", error);
       setAuth(null);
